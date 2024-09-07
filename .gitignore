@@ -1,3 +1,4 @@
 ChatPdfA/
 __pycache__/
-VectorStore
+VectorStore/
+.dockerignore
