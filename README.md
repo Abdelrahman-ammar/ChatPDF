@@ -1,6 +1,6 @@
 # Chat PDF using Gemini
 
-This project is just as the name suggests , you are talking with your pdfs using Gemini LLM from google , however there is some steps which is a must before running this project.
+This project is just as the name suggests , you are talking with your pdfs using Gemini LLM from google in addition to Memory which is provided from the popular library langchain, however there is some steps which is a must before running this project.
 
 ## How to start (Repo Clone)
 
@@ -32,8 +32,8 @@ In both clonning and dockerfile startup you will have to navigate to your web br
 
 ## How to use:
 
-1. After accessing the web browser you will have to browse and select and submit the pdf.
+1. After accessing the web browser you will have to browse , select and submit the pdf.
 
-2. Once the processing is completed and and knowledge base is created , you can ask questions related to the content you provided
+2. Once the processing is completed and the knowledge base is created , you can ask questions related to the content you provided
 
 However there is some limitations , which will be adhered in the futrue , like only files with pdf extensions can be uploaded and processed , however this also require a naive pdf where the file should not contain any images or structures like table or other shapes, (again this is only version 1 and will be enhanced in the feature).

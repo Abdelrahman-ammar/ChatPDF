@@ -3,7 +3,10 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain.chains.question_answering import load_qa_chain
+from langchain.chains.question_answering import load_qa_chain 
+from langchain.memory import ConversationBufferMemory
+from langchain.chains.conversation.base import ConversationChain
+from langchain.chains.qa_with_sources.loading import load_qa_with_sources_chain
 from PyPDF2 import PdfReader 
 
 def read_pdf(file):
@@ -56,6 +59,12 @@ def conversational_chain():
         Act as a helpful assistant , and answer the questions as detailed possible from the provided context and documnets, make sure
         to provide all the details, if the answer is not in provided context or document just say "answer is not available in the context"
         , be friendly in your responses but not too friendly\n\n
+
+
+        Conversation history:
+        {chat_history}
+
+
         Context:\n {context} \n
         Question: \n {question} \n
 
@@ -65,8 +74,10 @@ def conversational_chain():
                                    temperature=0.4)
 
 
-    prompt = PromptTemplate(template=prompt_template , input_variable=["context" , "question"])
+    prompt = PromptTemplate(template=prompt_template , input_variable=["chat_history","context" , "question"])
 
-    chain = load_qa_chain(model,chain_type= "stuff" , prompt=prompt )
+    memory = ConversationBufferMemory(memory_key="chat_history", input_key="question")
+
+    chain = load_qa_chain(model,chain_type= "stuff" , prompt=prompt , memory=memory )
 
     return chain
