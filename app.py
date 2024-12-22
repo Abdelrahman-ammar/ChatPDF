@@ -3,14 +3,14 @@ import os
 from utils import ( get_text_chunks,
                    create_knowledge_base,
                    user_question,
-                   read_pdf)
+                   read_pdf, read_json)
 import streamlit as st
 
 load_dotenv()
 
 google_api_key = os.getenv("GOOGLE_API_KEY")
 
-
+ 
 
 st.markdown(
     """
@@ -56,12 +56,13 @@ if "pending_question" not in st.session_state:
 
 
 st.sidebar.title("Upload PDF")
-uploaded_file = st.sidebar.file_uploader("Choose a PDF file", type="pdf" )
+uploaded_file = st.sidebar.file_uploader("Choose a PDF file or json file", type="json" )
 submit_button = st.sidebar.button("Submit")
 
 if submit_button and uploaded_file is not None:
     with st.spinner("Processing PDF and creating knowledge base..."):
-        pdf_text = read_pdf(uploaded_file)
+        # pdf_text = read_pdf(uploaded_file)
+        pdf_text = read_json(uploaded_file)
         chunks = get_text_chunks(pdf_text)
         
         create_knowledge_base(chunks)
@@ -116,10 +117,5 @@ if st.sidebar.button("Clear Chat History"):
     st.session_state.chat_history = []
     st.rerun()    
 
-
-# texts = "Hello my name is samir , I work as an Ai instructor , I love harry potter"
-# chunks = get_text_chunks(texts)
-# create_knowledge_base(chunks=chunks)
-# print(user_question("what is the name?"))
 
 
