@@ -1,3 +1,4 @@
+.env
 ChatPdfA/
 __pycache__/
 VectorStore/

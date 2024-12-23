@@ -16,14 +16,18 @@ from langchain.document_loaders import JSONLoader
 from langchain.tools import tool
 from langchain.agents import initialize_agent, Tool
 import plotly.express as px
+from dotenv import load_dotenv
 import pandas as pd
 import ast
-
 import os
-os.environ['LANGCHAIN_TRACING_V2'] = 'true'
-os.environ['LANGCHAIN_ENDPOINT'] = 'https://api.smith.langchain.com'
-os.environ['LANGCHAIN_API_KEY'] = "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"
-os.environ['LANGCHAIN_PROJECT']="pr-another-ruin-77"
+
+load_dotenv()
+
+
+os.environ['LANGCHAIN_TRACING_V2'] = os.getenv("LANGCHAIN_TRACING_V2")
+os.environ['LANGCHAIN_ENDPOINT'] = os.getenv("LANGCHAIN_ENDPOINT")
+os.environ['LANGCHAIN_API_KEY'] = os.getenv("LANGCHAIN_API_KEY")
+os.environ['LANGCHAIN_PROJECT']= os.getenv("LANGCHAIN_PROJECT")
 
 
 @tool("plot_map")
@@ -129,12 +133,13 @@ def user_question(question):
                                     allow_dangerous_deserialization=True)
     
     print("knowledge base created")
-    docs = knowledge_db.similarity_search(question) #ab
+    docs = knowledge_db.similarity_search(question) 
     retreiver = knowledge_db.as_retriever() #ab
-    results = generate_questiions(question)
     
+    # results = generate_questiions(question) #ab
+    # print(f"results : {results}")
 
-    chain = conversational_chain(retreiver) #ab
+    chain = conversational_chain(retreiver , question) #ab
 
     response = chain({  #ab
         "input_documents" :docs ,
@@ -165,14 +170,15 @@ def generate_questiions(question):
         | (lambda x: x.split("\n"))
         | remove_empty_strings
         )
-    results = chain.invoke({"question": question})
+    # results = chain.invoke({"question": question})
 
 
 
-    return results
+    # return results
+    return chain
 
 
-def conversational_chain(retreiver):
+def conversational_chain(retreiver , question):
     # prompt_template = """
     #     You are a Biodiversity bot that is an expert in Marine Species, especially those in the Red Sea. 
     #     You answer questions only if the answer is in your documents,
@@ -231,15 +237,16 @@ def conversational_chain(retreiver):
     # print(f"Success {result}")
     prompt = PromptTemplate(template=prompt_template , input_variable=["chat_history","context" , "question"]) #ab
 
-    # retreival_chain = (
-    #     {"context" : retreiver , "question":itemgetter("question")}
-    #     | prompt
-    #     | llm
-    #     | StrOutputParser() 
-    # )
+    retreival_chain = (
+        generate_questiions
+        | retreiver.map()
+        |llm
+        |StrOutputParser()
+    )
 
+    # retreival_chain.invoke({"question":question})
     memory = ConversationBufferMemory(memory_key="chat_history", input_key="question") #ab
 
-    chain = load_qa_chain(llm,chain_type= "stuff" , prompt=llm , memory=memory ) #ab
+    chain = load_qa_chain(llm,chain_type= "stuff" , prompt=prompt , memory=memory ) #ab
 
     return chain
